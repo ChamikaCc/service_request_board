@@ -14,6 +14,7 @@ export const getAllJobs = async (req, res, next) =>
       filter.$or = [
         { title:       { $regex: search, $options: "i" } }, //Look at title field.Find anything that matches the word.$options: "i" :ignore uppercase/lowercase
         { description: { $regex: search, $options: "i" } },
+        { location:    { $regex: search, $options: "i" } }
       ];
     }
 
