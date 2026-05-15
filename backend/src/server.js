@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 4000;
 async function start() {
   await connectDB();
   app.listen(PORT, () => {
-    console.log(`🚀 API listening on port ${PORT}`);
+    console.log(`API listening on port ${PORT}`);
   });
 }
 
