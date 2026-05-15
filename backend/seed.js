@@ -1,14 +1,10 @@
+
+import "dotenv/config";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import path from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, ".env") });
-
 import JobRequest from "./src/models/JobRequest.js";
+
+console.log("URI:", process.env.MONGODB_URI);
+
 
 const jobs = [
   {
