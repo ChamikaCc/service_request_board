@@ -1,41 +1,68 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const pathname = usePathname();
+  const pathname  = usePathname();
+  const router    = useRouter();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) setUser(JSON.parse(stored));
+  }, [pathname]);
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/");
+    router.refresh();
+  }
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-blue-600">
-          🔧 ServiceBoard
+    <nav className="navbar">
+      <Link href="/" className="navbar-logo">
+        🔧 ServiceBoard
+      </Link>
+      <div className="navbar-links">
+        <Link
+          href="/"
+          className={`nav-link ${pathname === "/" ? "active" : ""}`}
+        >
+          All Jobs
         </Link>
 
-        {/* Nav Links */}
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/"
-                ? "text-blue-600"
-                : "text-gray-600 hover:text-blue-600"
-            }`}
-          >
-            All Jobs
-          </Link>
-
-          <Link
-            href="/jobs/new"
-            className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            + Post a Job
-          </Link>
-        </div>
-
+        {user ? (
+          <>
+            <Link href="/jobs/new" className="btn-primary">
+              + Post a Job
+            </Link>
+            <span style={{ fontSize: "14px", color: "#6b7280" }}>
+              👤 {user.name}
+            </span>
+            <button
+              onClick={handleLogout}
+              className="btn-secondary"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/login"
+              className={`nav-link ${pathname === "/login" ? "active" : ""}`}
+            >
+              Login
+            </Link>
+            <Link href="/register" className="btn-primary">
+              Register
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

@@ -1,65 +1,149 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import JobCard, { Job } from "@/components/JobCard";
+import Link from "next/link";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const CATEGORIES = ["All","Plumbing","Electrical","Painting","Joinery","Other"];
+const STATUSES   = ["All","Open","In Progress","Closed"];
+const LOCATIONS  = ["All","Colombo","Kandy","Galle","Negombo","Kurunegala","Matara","Anuradhapura","Jaffna","Ratnapura"];
+
+export default function HomePage() {
+  const [jobs, setJobs]         = useState<Job[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState("");
+  const [category, setCategory] = useState("All");
+  const [status, setStatus]     = useState("All");
+  const [location, setLocation] = useState("All");
+  const [search, setSearch]     = useState("");
+
+  useEffect(() => {
+    fetchJobs();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, status, location]);
+
+  async function fetchJobs() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const params = new URLSearchParams();
+      if (category !== "All") params.append("category", category);
+      if (status   !== "All") params.append("status",   status);
+      if (location !== "All") params.append("search",   location);
+      if (search)             params.append("search",   search);
+
+      const res = await fetch(`${API_URL}/api/jobs?${params}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+
+      const data = await res.json();
+      setJobs(data.data);
+    } catch {
+      setError("Failed to load jobs. Make sure backend is running.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") fetchJobs();
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div>
+      {/* Page Header */}
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Service Requests</h1>
+          <p className="page-subtitle">Browse and manage service requests</p>
+        </div>
+        <Link href="/jobs/new" className="btn-primary">
+          + Post a Job
+        </Link>
+      </div>
+
+      {/* Filters */}
+      <div className="filters">
+        <input
+          type="text"
+          placeholder="Search by title or description..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleSearch}
+          className="filter-input"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="filter-select"
+        >
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c === "All" ? "All Categories" : c}
+            </option>
+          ))}
+        </select>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="filter-select"
+        >
+          {STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {s === "All" ? "All Statuses" : s}
+            </option>
+          ))}
+        </select>
+        <select
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="filter-select"
+        >
+          {LOCATIONS.map((l) => (
+            <option key={l} value={l}>
+              {l === "All" ? "All Locations" : l}
+            </option>
+          ))}
+        </select>
+        <button onClick={fetchJobs} className="btn-primary">
+          Search
+        </button>
+      </div>
+
+      {/* Error */}
+      {error && <div className="error-box">{error}</div>}
+
+      {/* Loading */}
+      {loading && <div className="spinner" />}
+
+      {/* Jobs Count */}
+      {!loading && !error && (
+        <p className="jobs-count">
+          {jobs.length} job{jobs.length !== 1 ? "s" : ""} found
+        </p>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && jobs.length === 0 && (
+        <div className="empty-state">
+          <p className="empty-icon">📋</p>
+          <p className="empty-title">No jobs found</p>
+          <p className="empty-text">
+            Try changing filters or post a new job
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      )}
+
+      {/* Jobs Grid */}
+      {!loading && !error && (
+        <div className="jobs-grid">
+          {jobs.map((job) => (
+            <JobCard key={job._id} job={job} />
+          ))}
         </div>
-      </main>
+      )}
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Service Request Board",
+  title: "Service Request Board | GlobalTNA",
   description: "A mini service request board for homeowners and tradespeople",
 };
 
@@ -14,11 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50">
-        
-        <main className="max-w-6xl mx-auto px-4 py-8">
+      <body>
+        <Navbar />
+        <div className="container">
           {children}
-        </main>
+        </div>
       </body>
     </html>
   );
