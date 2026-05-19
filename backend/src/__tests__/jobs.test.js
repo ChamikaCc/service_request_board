@@ -13,6 +13,12 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
+// clean up jobs before each test
+beforeEach(async () => {
+  await JobRequest.deleteMany();
+});
+
+
 // clean up jobs after each test
 afterEach(async () => {
   await JobRequest.deleteMany();
