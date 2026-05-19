@@ -131,29 +131,29 @@ npm run dev
 
 ### API Endpoints
 #### Jobs
-GET /api/jobs
-Get all jobs (supports filters)
-?category=Plumbing
-?status=Open
-?search=keyword
-GET /api/jobs/:id
-Get a single job
-POST /api/jobs
-Create a new job
-PATCH /api/jobs/:id
-Update job status
-DELETE /api/jobs/:id
-Delete a job
+- GET /api/jobs
+- Get all jobs (supports filters)
+  (?category=Plumbing
+  ?status=Open
+  ?search=keyword)
+- GET /api/jobs/:id
+- Get a single job
+- POST /api/jobs
+- Create a new job
+- PATCH /api/jobs/:id
+- Update job status
+- DELETE /api/jobs/:id
+- Delete a job
 
 #### Authentication
-JWT-based authentication implemented
-Only logged-in users can:
-Post jobs
-Delete jobs
+- JWT-based authentication implemented
+- Only logged-in users can:
+- Post jobs
+- Delete jobs
 
 #### Testing
 
-Run tests from backend:
+- Run tests from backend:
 
 cd backend
 npm test
@@ -163,6 +163,6 @@ npm test
 
 #### Seed Data
 
-To populate sample jobs:
+- To populate sample jobs:
 
 node seed/seed.js
